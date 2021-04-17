@@ -5,10 +5,7 @@ import kata.supermarket.Product;
 import kata.supermarket.UnitProduct;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class DiscountService {
     private final static int HALF = 2;
@@ -24,6 +21,24 @@ public class DiscountService {
 
     protected List<DiscountProduct> getDiscountProducts() {
         return DiscountProductRepository.getDiscountProducts();
+    }
+
+    public BigDecimal calculateDiscount(List<Item> items) {
+        Set<Integer> alreadyIteratedProduct = new HashSet<>();
+        BigDecimal totalDiscount = new BigDecimal(String.valueOf(BigDecimal.ZERO));
+        for (Item item : items) {
+            Product product = item.getProduct();
+            Optional<Discount> associatedDiscount = this.getProductAssociatedDiscount(product.getId());
+            if (associatedDiscount.isPresent()) {
+                if (associatedDiscount.get().getDiscountDescription().equals(Discount.BUY_ONE_GET_ONE_TXT)) {
+                    if (!alreadyIteratedProduct.contains(product.getId())) {
+                        alreadyIteratedProduct.add(product.getId());
+                        totalDiscount = totalDiscount.add(this.calculateBuyOneGetOneFreeDiscount(items, product));
+                    }
+                }
+            }
+        }
+        return totalDiscount;
     }
 
     public BigDecimal calculateBuyOneGetOneFreeDiscount(List<Item> items, Product product) {

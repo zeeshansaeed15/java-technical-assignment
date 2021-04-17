@@ -115,4 +115,23 @@ public class DiscountServiceTest {
     public void whenThreeSameProductstForBuyOneGetOneFreeThenReturnHalfPriceDiscountForTwoProducts() {
         Assertions.assertEquals(new BigDecimal("12.0"), discountService.calculateBuyOneGetOneFreeDiscount(setupThreeSameItems(), setupProduct()));
     }
+
+    @Test
+    public void whenCalculateDiscountForSingleProductThenReturnZeroDiscount() {
+        Assertions.assertEquals(BigDecimal.ZERO, discountService.calculateDiscount(setupOneItem()));
+    }
+
+    @Test
+    public void whenCalculateDiscountForTwoSameProductsThenReturnHalfPrice() {
+        Discount discount = new Discount(Discount.BUY_ONE_GET_ONE_TXT);
+        Mockito.doReturn(Optional.of(discount)).when(discountService).getProductAssociatedDiscount(1);
+        Assertions.assertEquals(new BigDecimal("12.0"), discountService.calculateDiscount(setupTwoSameItems()));
+    }
+
+    @Test
+    public void whenCalculateDiscountForThreeSameProductsThenReturnHalfDiscountForTwoProducts() {
+        Discount discount = new Discount(Discount.BUY_ONE_GET_ONE_TXT);
+        Mockito.doReturn(Optional.of(discount)).when(discountService).getProductAssociatedDiscount(1);
+        Assertions.assertEquals(new BigDecimal("12.0"), discountService.calculateDiscount(setupThreeSameItems()));
+    }
 }
